@@ -1,40 +1,52 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 
 function App() {
-  const [result, setResult] = useState('');
+  const [command, setCommand] = useState('');
+  const [status, setStatus] = useState('Kutib turibdi...');
 
+  // Ovozli buyruqlarni olish funksiyasi
   const startListening = () => {
     const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
     recognition.lang = 'uz-UZ';
 
     recognition.onresult = (event) => {
-      const command = event.results[0][0].transcript.toLowerCase();
-      setResult(command);
-      executeCommand(command);
+      const spokenCommand = event.results[0][0].transcript.toLowerCase();
+      setCommand(spokenCommand);
+      executeCommand(spokenCommand);
     };
 
     recognition.onerror = (event) => {
-      console.error("Xato: " + event.error);
+      setStatus("Xato yuz berdi: " + event.error);
     };
 
     recognition.start();
   };
 
-  const executeCommand = (command) => {
-    if (command.includes("chiroqni yoq")) {
-      alert("Chiroq yoqildi! (simulyatsiya)");
-    } else if (command.includes("youtube'ni och")) {
+  // Ovozli buyruqlarni bajarish
+  const executeCommand = (spokenCommand) => {
+    if (spokenCommand.includes("chiroqni yoq")) {
+      setStatus("Chiroq yoqildi!");
+      // Chiroqni yoqish simulyatsiyasi
+    } else if (spokenCommand.includes("youtubeni och")) {
+      setStatus("YouTube ochildi!");
       window.open("https://www.youtube.com", "_blank");
     } else {
-      alert("Bu buyruqni bajarish imkoni yo'q: " + command);
+      setStatus("Bunday buyruq mavjud emas!");
     }
   };
 
   return (
-    <div style={{ textAlign: 'center', marginTop: '50px' }}>
-      <h1>GPT Qurilma Boshqarish</h1>
-      <button onClick={startListening}>Ovozli Buyruq Berish</button>
-      <p>Buyruq: {result}</p>
+    <div className="h-screen flex items-center justify-center bg-gray-100">
+      <div className="bg-white p-10 rounded shadow-lg text-center">
+        <h1 className="text-2xl font-bold mb-5">GPT Qurilma Boshqarish</h1>
+        <button 
+          onClick={startListening} 
+          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-700">
+          Ovozli Buyruqni Boshlash
+        </button>
+        <p className="mt-5 text-gray-700">Sizning buyruqingiz: <span className="font-bold">{command}</span></p>
+        <p className="mt-2 text-green-600">{status}</p>
+      </div>
     </div>
   );
 }
